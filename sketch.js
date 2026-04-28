@@ -8,6 +8,7 @@ let bathroomImg;
 let gardenImg;
 let officeGardenImg;
 let interiorImg;
+let toiletImg; //add the toilet after removed the background to the backgrounds.
 
 let entranceZoom = 1;
 let entranceClicks = 0;
@@ -27,6 +28,7 @@ function preload() { //loaded images in
 gardenImg = loadImage("assets/garden.jpg");
 officeGardenImg = loadImage("assets/garden-desk.jpg");
 interiorImg = loadImage("assets/pixel_interiors.png");
+toiletImg = loadImage("assets/toilet-removed-background.png");
 }
 
 function setup() {
@@ -181,21 +183,29 @@ function windowResized() {
 }
 //done with general structure, and now adding details to each condition. different seed/flower will have different story/outcome
 // if conditions being set
- 
+
 function drawFlowerToiletScene() {
   background(0);
   imageMode(CENTER);
-if (chosenFlower=="grass"){ //add the grass background
-  image(bathroomImg,width/2,height/2,width,height);
-}
-if (chosenFlower=="lily"){
-  image(gardenImg,width/2,height/2, width, height);
-}
-if (chosenFlower == "peony"){
-  image(officeGardenImg,width/2,height/2,width,height);
-}
-if (chosenFlower== "sunflower"){
-  image (interiorImg,width/2,height/2,width,height);
+
+  if (chosenFlower == "grass") {
+    image(bathroomImg, width / 2, height / 2, width, height);
+  } //this one dont need toilet because there is a toilet in there already
+
+  if (chosenFlower == "lily") {
+    image(gardenImg, width / 2, height / 2, width, height);
+    image(toiletImg, width * 0.5, height * 0.72, 220, 220);
+  }
+
+  if (chosenFlower == "peony") {
+    image(officeGardenImg, width / 2, height / 2, width, height);
+    image(toiletImg, width * 0.5, height * 0.72, 220, 220);
+  }
+
+  if (chosenFlower == "sunflower") {
+    image(interiorImg, width / 2, height / 2, width, height);
+    image(toiletImg, width * 0.5, height * 0.72, 220, 220);
+  }
 }
 
-}
+
