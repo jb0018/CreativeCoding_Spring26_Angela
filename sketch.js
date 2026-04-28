@@ -44,7 +44,7 @@ function draw() {
     drawSeedRoomScene();
   }
   if (scene ==2) {
-    drawFlowerToiletScne();
+    drawFlowerToiletScene();
   }
 }
 
@@ -157,22 +157,22 @@ function checkFlowerClick() {
 // 4 numbers inside the dist function is the x and y of the mouse, and the x and y of the flower, and then compare the distance with the flower size to determine ifit's clicked or not because if clicked. If the mouse click happens close enough to the grass/flower, choose grass and move to the next scene.
   if (dist(mouseX, mouseY, grassX, grassY) < flowerSize) {
     chosenFlower = "grass";
-    scene = 2
+    scene = 2;
   }
 
   if (dist(mouseX, mouseY, lilyX, lilyY) < flowerSize) {
     chosenFlower = "lily";
-    scene =2
+    scene =2;
   }
 
   if (dist(mouseX, mouseY, peonyX, peonyY) < flowerSize) {
     chosenFlower = "peony";
-    scene=2
+    scene=2;
   }
 
   if (dist(mouseX, mouseY, sunflowerX, sunflowerY) < flowerSize) {
     chosenFlower = "sunflower";
-    scene=2
+    scene=2;
   }
 }
 
@@ -186,7 +186,7 @@ function drawFlowerToiletScene() {
   background(0);
   imageMode(CENTER);
 if (chosenFlower=="grass"){ //add the grass background
-  image(bathroomImg,width/2,heigh/2,width,heigh);
+  image(bathroomImg,width/2,height/2,width,height);
 }
 if (chosenFlower=="lily"){
   image(gardenImg,width/2,height/2, width, height);
