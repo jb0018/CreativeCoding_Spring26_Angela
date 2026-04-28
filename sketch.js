@@ -9,10 +9,15 @@ let gardenImg;
 let officeGardenImg;
 let interiorImg;
 let toiletImg; //add the toilet after removed the background to the backgrounds.
+//wateringcan part
+let wateringCanImg;
+let canX;
+let canY;
+let canSize=150;
+let draggingCan=false; //
+let flowerGrown = false
 
 let raindrops = [];
-let isRaining = true; // getting ready for the weather part
-
 //seed 
 let seedX;
 let seedY =-40;
@@ -37,6 +42,7 @@ gardenImg = loadImage("assets/garden.jpg");
 officeGardenImg = loadImage("assets/garden-desk.jpg");
 interiorImg = loadImage("assets/pixel_interiors.png");
 toiletImg = loadImage("assets/toilet-removed-background.png");
+wateringCanImg = loadImage("assets/watering_can.png"); //added watering can as an asset to water flower
 }
 
 function setup() {
@@ -49,6 +55,10 @@ for (let i = 0; i < 80; i++) {
     size: random(8, 16)
   });
 }
+
+canX = width*0.12;
+canY = height *0.78;
+
 }
 
 function draw() {
@@ -144,19 +154,6 @@ function showSeedText() {
   }
 }
 
-function mousePressed() {
-  if (scene == 0) {
-    entranceClicks++;
-    entranceZoom += 0.18; //zoom in by increasing the scale by 0.18 each click
-
-    if (entranceClicks >= 5) {
-      scene = 1;
-    }
-  } else if (scene == 1) {
-    checkFlowerClick();
-  }
-}
-
 function checkFlowerClick() {
   let flowerSize = 155; //this is to set the flowersize as 155 pixels, and thus the clickable area is also within the 155 pixels
 
@@ -242,6 +239,11 @@ function drawFlowerToiletScene() {
 
     drawWind();
 }
+drawWateringCan();
+
+if (draggingCan) {
+  drawWaterDropsFromCan();
+}
 }
 
 function drawRain() {
@@ -299,7 +301,6 @@ function drawWindLine(x, y, w) {
 
   line(x + 90, y + 65, x + 150, y + 65);
 }
-
 function drawSun() { //anther weather variable
    fill(255, 220, 90, 70);
   circle(width * 0.88, height * 0.13, 150);
@@ -321,15 +322,17 @@ function mousePressed() {
     }
   } else if (scene == 1) {
     checkFlowerClick();
-  } else if (scene == 2) {
-    isRaining = !isRaining; //mousepressed to let the rain drop
+    }
+  else if (scene == 2) {
+  if (dist(mouseX, mouseY, canX, canY) < canSize) { //added this part while adding the watering can 
+    draggingCan = true // this sets the condition of when to trigger watering can
   }
+}
 }
 
 //draw seed:
 function drawSeed(x, y) {
   noStroke();
-
   fill(190, 150, 80);
   ellipse(x, y, 28, 38);
 
@@ -349,4 +352,38 @@ function drawDroppingSeed() {
       seedDropped = true;
     }
   }
+}
+
+
+
+checkCanNearToilet();
+
+if (flowerGrown) {
+  drawGrownFlower();
+}
+
+
+function drawWateringCan() {
+  imageMode(CENTER);
+  image(wateringCanImg, canX, canY, canSize, canSize);
+}
+
+function drawWaterDropsFromCan() { //blue circles ciear watering can as is they are coming out of the can
+  noStroke();
+  fill(130, 200, 255, 200);
+
+  circle(canX + 55, canY + 10, 10);
+  circle(canX + 70, canY + 25, 8);
+  circle(canX + 85, canY + 40, 6);
+}
+
+
+function mouseDragged() {
+  if (draggingCan) {
+    canX = mouseX;
+    canY = mouseY;
+  }
+}
+function mouseReleased() {
+  draggingCan = false;
 }
