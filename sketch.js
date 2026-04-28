@@ -13,6 +13,12 @@ let toiletImg; //add the toilet after removed the background to the backgrounds.
 let raindrops = [];
 let isRaining = true; // getting ready for the weather part
 
+//seed 
+let seedX;
+let seedY =-40;
+let seedTargetY;
+let seedDropped=false;
+
 let entranceZoom = 1;
 let entranceClicks = 0;
 let currentBg; //assign the current background to this variable and then change the current based on the chosen flower/seed
@@ -200,24 +206,41 @@ function drawFlowerToiletScene() {
 
   if (chosenFlower == "grass") {
     image(bathroomImg, width / 2, height / 2, width, height);
+  seedX = width * 0.75;
+  seedTargetY =height *0.42; //fixed so the seed can drop visually like into the toilet
+  drawDroppingSeed(); // after changing scene i want the seed drop into the toilet location  
+  drawRain();
   } //this one dont need toilet because there is a toilet in there already
 
   if (chosenFlower == "lily") {
     image(gardenImg, width / 2, height / 2, width, height);
     image(toiletImg, width * 0.53, height * 0.55, 500, 500); //changed size several times to make the toilet bigger
+     seedX = width * 0.47;
+    seedTargetY = height * 0.73; //based on toilet location
+
+    drawDroppingSeed();
+
+    drawRain();
   }
 
   if (chosenFlower == "peony") {
     image(officeGardenImg, width / 2, height / 2, width, height);
     image(toiletImg, width * 0.74, height * 0.265, 450, 450);
+     seedX = width * 0.68;
+    seedTargetY = height * 0.47;
+    drawDroppingSeed();
+
+    drawSun();
   }
 
   if (chosenFlower == "sunflower") {
     image(interiorImg, width / 2, height / 2, width, height);
     image(toiletImg, width * 0.65, height * 0.65, 480, 480);
-  }
-  if (isRaining) {
-  drawRain();
+    seedX = width * 0.59;
+    seedTargetY = height * 0.82;
+    drawDroppingSeed();
+
+    drawWind();
 }
 }
 
@@ -227,17 +250,20 @@ function drawRain() {
 
     drawRaindrop(drop.x, drop.y, drop.size);
 
-    drop.y += drop.speed;
-
+    drop.y += drop.speed; 
+ //begin of AI assist, this part recycles each raindrop. Once it falls past the bottom of the canvas, it gets moved back to the top at a random x-position, 
+ // so the rain can continue without needing endless new drops.
+//I wanted raindrops to keep falling repeatedly, and AI helped explain that when a drop moves below the canvas, I can reset its y-position back above the screen, randomize its x-position, and give it a new speed.
     if (drop.y > height) {
       drop.y = random(-100, 0);
       drop.x = random(width);
       drop.speed = random(4, 9);
+    //end of AI assist
     }
   }
 }
 
-function drawRaindrop(x, y, size) {
+function drawRaindrop(x, y, size) { //custom my own raindrop
   push();
   translate(x, y);
   noStroke();
@@ -252,6 +278,39 @@ function drawRaindrop(x, y, size) {
   pop();
 }
 
+function drawWind() {
+  noFill();
+   stroke(210, 235, 245, 170);
+  strokeWeight(5);
+  strokeCap(ROUND);
+
+  let move = (frameCount * 2) % (width + 300) - 300;
+
+  drawWindLine(move, height * 0.25, 180);
+  drawWindLine(move - 260, height * 0.45, 220);
+  drawWindLine(move - 520, height * 0.65, 160);;
+}
+function drawWindLine(x, y, w) { 
+  line(x, y, x + w, y);// main soft line
+
+  arc(x + w + 25, y - 20, 50, 40, HALF_PI, TWO_PI + HALF_PI);   // curl at the end
+
+  line(x + 30, y + 35, x + w * 0.65, y + 35);  // smaller line under it
+
+  line(x + 90, y + 65, x + 150, y + 65);
+}
+
+function drawSun() { //anther weather variable
+   fill(255, 220, 90, 70);
+  circle(width * 0.88, height * 0.13, 150);
+
+  fill(255, 235, 120, 120);
+  circle(width * 0.88, height * 0.13, 95);
+
+  fill(255, 245, 180, 180);
+  circle(width * 0.88, height * 0.13, 45);
+}
+
 function mousePressed() {
   if (scene == 0) {
     entranceClicks++;
@@ -263,6 +322,31 @@ function mousePressed() {
   } else if (scene == 1) {
     checkFlowerClick();
   } else if (scene == 2) {
-    isRaining = !isRaining;
+    isRaining = !isRaining; //mousepressed to let the rain drop
+  }
+}
+
+//draw seed:
+function drawSeed(x, y) {
+  noStroke();
+
+  fill(190, 150, 80);
+  ellipse(x, y, 28, 38);
+
+  fill(230, 190, 110);
+  ellipse(x + 18, y + 6, 24, 34);
+
+  fill(140, 100, 50);
+  ellipse(x - 16, y + 8, 22, 30);
+}
+function drawDroppingSeed() {
+  if (!seedDropped) {
+    seedY += 2; // smaller number = slower drop, i decreased the number because it was too fast
+
+    drawSeed(seedX, seedY);
+
+    if (seedY >= seedTargetY) {
+      seedDropped = true;
+    }
   }
 }
