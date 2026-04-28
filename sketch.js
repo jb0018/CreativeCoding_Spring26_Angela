@@ -194,17 +194,17 @@ function drawFlowerToiletScene() {
 
   if (chosenFlower == "lily") {
     image(gardenImg, width / 2, height / 2, width, height);
-    image(toiletImg, width * 0.5, height * 0.72, 220, 220);
+    image(toiletImg, width * 0.53, height * 0.55, 500, 500); //changed size several times to make the toilet bigger
   }
 
   if (chosenFlower == "peony") {
     image(officeGardenImg, width / 2, height / 2, width, height);
-    image(toiletImg, width * 0.5, height * 0.72, 220, 220);
+    image(toiletImg, width * 0.74, height * 0.265, 450, 450);
   }
 
   if (chosenFlower == "sunflower") {
     image(interiorImg, width / 2, height / 2, width, height);
-    image(toiletImg, width * 0.5, height * 0.72, 220, 220);
+    image(toiletImg, width * 0.65, height * 0.65, 480, 480);
   }
 }
 
