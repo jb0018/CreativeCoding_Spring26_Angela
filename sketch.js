@@ -10,12 +10,14 @@ let officeGardenImg;
 let interiorImg;
 let toiletImg; //add the toilet after removed the background to the backgrounds.
 
+let raindrops = [];
+let isRaining = true; // getting ready for the weather part
+
 let entranceZoom = 1;
 let entranceClicks = 0;
 let currentBg; //assign the current background to this variable and then change the current based on the chosen flower/seed
 let chosenFlower = ""; //to keep track to which flower is chosen and then the one is being stored
 let scene = 0; //set the scene
-
 
 function preload() { //loaded images in
   entranceImg = loadImage("assets/tech-forest.jpg");
@@ -33,6 +35,14 @@ toiletImg = loadImage("assets/toilet-removed-background.png");
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+for (let i = 0; i < 80; i++) {
+  raindrops.push({
+    x: random(width),
+    y: random(-height, 0),
+    speed: random(4, 9),
+    size: random(8, 16)
+  });
+}
 }
 
 function draw() {
@@ -206,6 +216,53 @@ function drawFlowerToiletScene() {
     image(interiorImg, width / 2, height / 2, width, height);
     image(toiletImg, width * 0.65, height * 0.65, 480, 480);
   }
+  if (isRaining) {
+  drawRain();
+}
 }
 
+function drawRain() {
+  for (let i = 0; i < raindrops.length; i++) { //want the raindrop to fall from top
+    let drop = raindrops[i];
 
+    drawRaindrop(drop.x, drop.y, drop.size);
+
+    drop.y += drop.speed;
+
+    if (drop.y > height) {
+      drop.y = random(-100, 0);
+      drop.x = random(width);
+      drop.speed = random(4, 9);
+    }
+  }
+}
+
+function drawRaindrop(x, y, size) {
+  push();
+  translate(x, y);
+  noStroke();
+  fill(120, 180, 255, 160);
+
+  beginShape();
+  vertex(0, -size);
+  bezierVertex(size * 0.7, -size * 0.2, size * 0.5, size, 0, size);
+  bezierVertex(-size * 0.5, size, -size * 0.7, -size * 0.2, 0, -size);
+  endShape(CLOSE);
+
+  pop();
+}
+
+function mousePressed() {
+  if (scene == 0) {
+    entranceClicks++;
+    entranceZoom += 0.18;
+
+    if (entranceClicks >= 5) {
+      scene = 1;
+    }
+  } else if (scene == 1) {
+    checkFlowerClick();
+  } else if (scene == 2) {
+    isRaining = !isRaining;
+  }
+}
