@@ -30,6 +30,17 @@ let currentBg; //assign the current background to this variable and then change 
 let chosenFlower = ""; //to keep track to which flower is chosen and then the one is being stored
 let scene = 0; //set the scene
 
+//watering timing
+let wateringStartTime=0;
+let wateringLongEnough = false;
+let flowerStage = 0
+
+//growthstage
+let seedDroppedTime = 0;
+let seedNeglected = false;
+let seedFlushed = false;
+let flushY = 0; //this is added if the flower is not taken care of when reach certain seconds/
+
 function preload() { //loaded images in
   entranceImg = loadImage("assets/tech-forest.jpg");
   seedRoomImg = loadImage("assets/domestic-cactus.jpg");
@@ -211,7 +222,7 @@ function drawFlowerToiletScene() {
 
   if (chosenFlower == "lily") {
     image(gardenImg, width / 2, height / 2, width, height);
-    image(toiletImg, width * 0.53, height * 0.55, 500, 500); //changed size several times to make the toilet bigger
+    image(toiletImg, width * 0.53, height * 0.55, 550, 550); //changed size several times to make the toilet bigger
      seedX = width * 0.47;
     seedTargetY = height * 0.73; //based on toilet location
 
@@ -222,7 +233,7 @@ function drawFlowerToiletScene() {
 
   if (chosenFlower == "peony") {
     image(officeGardenImg, width / 2, height / 2, width, height);
-    image(toiletImg, width * 0.74, height * 0.265, 450, 450);
+    image(toiletImg, width * 0.74, height * 0.265, 550, 550);
      seedX = width * 0.68;
     seedTargetY = height * 0.47;
     drawDroppingSeed();
@@ -232,7 +243,7 @@ function drawFlowerToiletScene() {
 
   if (chosenFlower == "sunflower") {
     image(interiorImg, width / 2, height / 2, width, height);
-    image(toiletImg, width * 0.65, height * 0.65, 480, 480);
+    image(toiletImg, width * 0.65, height * 0.65, 550, 550);
     seedX = width * 0.59;
     seedTargetY = height * 0.82;
     drawDroppingSeed();
@@ -244,6 +255,12 @@ drawWateringCan();
 if (draggingCan) {
   drawWaterDropsFromCan();
 }
+checkSeedNeglect();
+drawFlushedSeed();
+waterProgress();
+drawFlowerProgress(); //added these function after i added the flushed away
+//flush away might beed an audio 
+
 }
 
 function drawRain() {
@@ -326,6 +343,9 @@ function mousePressed() {
   else if (scene == 2) {
   if (dist(mouseX, mouseY, canX, canY) < canSize) { //added this part while adding the watering can 
     draggingCan = true // this sets the condition of when to trigger watering can
+    wateringStartTime = millis();
+    wateringLongEnough =false;
+
   }
 }
 }
@@ -350,18 +370,11 @@ function drawDroppingSeed() {
 
     if (seedY >= seedTargetY) {
       seedDropped = true;
+       seedDroppedTime = millis();
+      flushY = seedTargetY; //added these two after i added the millis();
     }
   }
 }
-
-
-
-checkCanNearToilet();
-
-if (flowerGrown) {
-  drawGrownFlower();
-}
-
 
 function drawWateringCan() {
   imageMode(CENTER);
@@ -370,13 +383,12 @@ function drawWateringCan() {
 
 function drawWaterDropsFromCan() { //blue circles ciear watering can as is they are coming out of the can
   noStroke();
-  fill(130, 200, 255, 200);
+  fill(60, 100, 255, 200);
 
   circle(canX + 55, canY + 10, 10);
   circle(canX + 70, canY + 25, 8);
   circle(canX + 85, canY + 40, 6);
 }
-
 
 function mouseDragged() {
   if (draggingCan) {
@@ -386,4 +398,83 @@ function mouseDragged() {
 }
 function mouseReleased() {
   draggingCan = false;
+  wateringStartTime =0;
+}
+
+function waterProgress(){
+  if (!seedFlushed && draggingCan && dist(canX, canY, seedX, seedTargetY) < 160) { // originally I had: let heldTime = millis() - wateringStartTime; if (heldTime > 4000) { wateringLongEnough = true; but this does not takin in the toilet location, so I switched to using dist instead after AI assisted this would makes more sense.
+   //dist(canX, canY, seedX, seedTargetY) measures the distance between the watering can and the seed target. < 160 means close enough
+    let heldTime = millis() - wateringStartTime;
+    if (heldTime > 5500) {
+      wateringLongEnough = true;
+      flowerStage = 3;
+    } else if (heldTime > 4000) {
+      flowerStage = 2;
+    } else if (heldTime > 2000) {
+      flowerStage = 1;
+    }
+  }
+}
+
+function checkSeedNeglect() {
+  if (seedDropped && flowerStage == 0 && !seedFlushed) {
+    let neglectTime = millis() - seedDroppedTime;
+
+    if (neglectTime > 5000) {
+      seedFlushed = true;
+    }
+  }
+}
+
+function drawFlushedSeed() {
+  if (seedFlushed) {
+    flushY += 3;
+
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(25);
+    text("seed flushed away...", width / 2, height * 0.35);
+
+    drawSeed(seedX, flushY);
+
+    noFill();
+    stroke(150, 210, 255);
+    strokeWeight(4);
+    arc(seedX, seedTargetY, 70, 45, 0, PI + HALF_PI);
+  }
+}
+
+function drawFlowerProgress() {
+  if (seedFlushed) {
+    return;
+  }
+
+  if (flowerStage == 1) {
+    noStroke();
+    fill(80, 180, 90);
+    ellipse(seedX, seedTargetY +10, 20, 35); //this is like x,y,width,height
+  }
+
+  if (flowerStage == 2) {
+    stroke(60, 150, 70);
+    strokeWeight(5);
+    line(seedX, seedTargetY+30, seedX, seedTargetY - 50);
+
+    noStroke();
+    fill(80, 180, 90);
+    ellipse(seedX - 18, seedTargetY - 15, 35, 18);
+    ellipse(seedX + 18, seedTargetY - 30, 35, 18);
+  }
+
+  if (flowerStage == 3) {
+    let flowerImg;
+
+    if (chosenFlower == "grass") flowerImg = grassImg;
+    if (chosenFlower == "lily") flowerImg = lilyImg;
+    if (chosenFlower == "peony") flowerImg = peonyImg;
+    if (chosenFlower == "sunflower") flowerImg = sunflowerImg;
+
+    imageMode(CENTER);
+    image(flowerImg, seedX, seedTargetY - 40, 140, 140);
+  }
 }
