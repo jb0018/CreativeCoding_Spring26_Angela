@@ -1,7 +1,6 @@
 # CreativeCoding_Spring26_Angela
 Final CC project
-
-html: http://127.0.0.1:5500/index.html
+I could not make more pushes after i uplaoded the audios because they are too big for github, even after i trimmed them to less than 5 seconds. 
 
 
 logic:
